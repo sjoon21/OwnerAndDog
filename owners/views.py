@@ -1,5 +1,6 @@
 
 import json
+from os import stat
 
 from django.http import JsonResponse
 from django.views import View
@@ -18,6 +19,39 @@ class OwnersView(View):
         ) 
 
         return JsonResponse({'message':'created'}, status=201)
+    
+    def get(self, request):
+        owners    = Owner.objects.all()
+        results = []
+        for owner in owners: 
+            results.append(
+                {
+                    "name"  : owner.name, 
+                    "age"   : owner.age,
+                    "email" : owner.email
+                    # Get owners information from DB
+                    # Print out the name, age, and email
+                }
+            )
+        return JsonResponse({'results':results}, status=200)
+    
+    def get(self, request):
+        owners = Owner.objects.all()
+        results = []
+        for owner in owners:
+            dogs  = [
+                {"DogName": dog.name} for dog in Dog.objects.filter(owner_id = owner.id)
+            ]
+            # Add Dog list into owners' info.
+            results.append(
+                {
+                    "owner_name"       : owner.name,
+                    "owner_age"        : owner.age,
+                    "dog_list"         : dogs
+                }
+            )
+        return JsonResponse({'results' : results}, status=200)
+        
 
 class DogsView(View):
     def post(self, request):
@@ -39,3 +73,16 @@ class DogsView(View):
         )
 
         return JsonResponse({'message':'created'}, status=201)
+
+    def get(self, request):
+        dogs    = Dog.objects.all()
+        results = []
+        for dog in dogs: 
+            results.append(
+                {
+                    "name"  : dog.name, 
+                    "age"   : dog.age,
+                    
+                }
+            )
+        return JsonResponse({'results':results}, status=200)
